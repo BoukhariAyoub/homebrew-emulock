@@ -1,8 +1,8 @@
 class Emulock < Formula
   desc "Enforced Android emulator reservations for parallel AI coding agents"
   homepage "https://github.com/BoukhariAyoub/emulock"
-  url "https://github.com/BoukhariAyoub/emulock/archive/refs/tags/v0.2.1.tar.gz"
-  sha256 "d84a2df5b10a77fd77e3530b11a3383b471b9e325d2280e53924cc77f9bec22c"
+  url "https://github.com/BoukhariAyoub/emulock/archive/refs/tags/v0.2.2.tar.gz"
+  sha256 "c0440dadb1db1586b10fe054746c3a1ee23c63a90362f8cc5957d7daa63a7ad6"
   license "MIT"
   head "https://github.com/BoukhariAyoub/emulock.git", branch: "main"
 
@@ -45,7 +45,7 @@ class Emulock < Formula
     assert_match "SERIAL", shell_output("#{bin}/emulock status")
     assert_predicate pkgshare/"hooks/claude-code/emulock-guard.sh", :exist?
     assert_predicate pkgshare/"skills/emulock/SKILL.md", :exist?
-    assert_match "emulock 0.2.1", shell_output("#{bin}/emulock version")
+    assert_match "emulock 0.2.2", shell_output("#{bin}/emulock version")
     # The hook itself: kill-server is refused for everyone.
     payload = '{"session_id":"t","tool_input":{"command":"adb kill-server"}}'
     assert_match "deny", pipe_output("#{bin}/emulock guard", payload)
