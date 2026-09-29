@@ -1,8 +1,8 @@
 class Emulock < Formula
   desc "Enforced Android emulator reservations for parallel AI coding agents"
   homepage "https://github.com/BoukhariAyoub/emulock"
-  url "https://github.com/BoukhariAyoub/emulock/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "677e910682eaf3d2e30480a18a3cb434fdcf7976804b29afe016902cb2e0cce7"
+  url "https://github.com/BoukhariAyoub/emulock/archive/refs/tags/v0.2.1.tar.gz"
+  sha256 "d84a2df5b10a77fd77e3530b11a3383b471b9e325d2280e53924cc77f9bec22c"
   license "MIT"
   head "https://github.com/BoukhariAyoub/emulock.git", branch: "main"
 
@@ -15,40 +15,24 @@ class Emulock < Formula
 
   def install
     bin.install "bin/emulock", "bin/emulock-lab"
-    libexec.install "libexec/device_lab.py"
+    # The pool script and the python tools (doctor, evidence, init, the dashboard)
+    # are found by bin/emulock relative to its own real path.
+    libexec.install Dir["libexec/*.py"], "libexec/emulock-pool.sh"
     pkgshare.install "hooks", "skills"
     doc.install "README.md"
   end
 
   def caveats
     <<~EOS
-      emulock is installed, but nothing is enforced until you wire the guard
-      into your agent harness. This step is deliberately manual: a hook decides
-      which commands an agent may run, and a hook an agent could install is one
-      it could also remove.
+      emulock is installed, but nothing is enforced until the guard is wired
+      into your agent harness. Run this yourself, in a terminal — it shows each
+      change and asks first:
 
-      Add this to .claude/settings.json in each repo you want protected, then
-      commit it so every contributor is covered:
+        emulock init              # ~/.claude: every project on this machine
+        emulock init --project    # or one repo's .claude/ (commit it for your team)
 
-        {
-          "hooks": {
-            "PreToolUse": [
-              {
-                "matcher": "Bash",
-                "hooks": [
-                  { "type": "command", "command": "#{pkgshare}/hooks/claude-code/emulock-guard.sh" }
-                ]
-              }
-            ]
-          }
-        }
-
-      Teach your agents the protocol too, so they claim correctly instead of
-      learning the rules by being refused:
-
-        cp -R #{pkgshare}/skills/emulock .claude/skills/
-
-      Then confirm enforcement is actually live:
+      It also links the agent skill, so agents claim correctly instead of
+      learning the rules by being refused. Then confirm enforcement is live:
 
         emulock doctor
     EOS
@@ -60,5 +44,10 @@ class Emulock < Formula
     ENV["EMULATOR_LOCK_DIR"] = testpath/"locks"
     assert_match "SERIAL", shell_output("#{bin}/emulock status")
     assert_predicate pkgshare/"hooks/claude-code/emulock-guard.sh", :exist?
+    assert_predicate pkgshare/"skills/emulock/SKILL.md", :exist?
+    assert_match "emulock 0.2.1", shell_output("#{bin}/emulock version")
+    # The hook itself: kill-server is refused for everyone.
+    payload = '{"session_id":"t","tool_input":{"command":"adb kill-server"}}'
+    assert_match "deny", pipe_output("#{bin}/emulock guard", payload)
   end
 end
