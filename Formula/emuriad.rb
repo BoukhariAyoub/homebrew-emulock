@@ -1,8 +1,8 @@
 class Emuriad < Formula
   desc "Enforced Android emulator reservations for parallel AI coding agents"
   homepage "https://github.com/BoukhariAyoub/emuriad"
-  url "https://github.com/BoukhariAyoub/emuriad/archive/refs/tags/v0.3.0.tar.gz"
-  sha256 "911801aa015d88f3089fcd2b0f13b00266f7278cacc0d252b5109b2305d89354"
+  url "https://github.com/BoukhariAyoub/emuriad/archive/refs/tags/v0.3.1.tar.gz"
+  sha256 "5636d067692d4d5aa73a4ec4b43a16ad6e4009e3f95b3cf8b42a31f403e874ab"
   license "MIT"
   head "https://github.com/BoukhariAyoub/emuriad.git", branch: "main"
 
@@ -45,8 +45,12 @@ class Emuriad < Formula
 
   test do
     assert_match "emulator reservations", shell_output("#{bin}/emuriad --help")
-    # A scratch store, so the test never reads or writes a real lock.
+    # A scratch store, so the test never reads or writes a real lock, and a stub
+    # adb, so it passes on a machine without the Android SDK.
     ENV["EMULATOR_LOCK_DIR"] = testpath/"locks"
+    (testpath/"bin/adb").write "#!/bin/sh\necho 'List of devices attached'\n"
+    chmod 0755, testpath/"bin/adb"
+    ENV.prepend_path "PATH", testpath/"bin"
     assert_match "SERIAL", shell_output("#{bin}/emuriad status")
     assert_path_exists pkgshare/"hooks/claude-code/emuriad-guard.sh"
     assert_path_exists pkgshare/"skills/emuriad/SKILL.md"
