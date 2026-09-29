@@ -1,8 +1,8 @@
 class Emuriad < Formula
   desc "Enforced Android emulator reservations for parallel AI coding agents"
   homepage "https://github.com/BoukhariAyoub/emuriad"
-  url "https://github.com/BoukhariAyoub/emuriad/archive/refs/tags/v0.3.1.tar.gz"
-  sha256 "5636d067692d4d5aa73a4ec4b43a16ad6e4009e3f95b3cf8b42a31f403e874ab"
+  url "https://github.com/BoukhariAyoub/emuriad/archive/refs/tags/v0.3.2.tar.gz"
+  sha256 "358d536d0ae588b38359a69bf905ec9a7d2362e4a88e3d1044d3c527876b9d11"
   license "MIT"
   head "https://github.com/BoukhariAyoub/emuriad.git", branch: "main"
 
